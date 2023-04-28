@@ -1,5 +1,5 @@
 """
-Version: 	
+Version: 	Update to ry_compute.py published in Skoglund et al. 2013
 Author:		Kyriaki Anastasiadou; Pontus Skoglund
 Contact: 	kyriaki.anastasiadou@crick.ac.uk; pontus.skoglund@gmail.com
 Date: 		12/01/2023
