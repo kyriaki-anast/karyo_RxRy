@@ -1,8 +1,8 @@
 """
-Version: 	Update to ry_compute.py published in Skoglund et al. 2013
+Version: 	
 Author:		Kyriaki Anastasiadou; Pontus Skoglund
 Contact: 	kyriaki.anastasiadou@crick.ac.uk; pontus.skoglund@gmail.com
-Date: 		12/01/2023
+Date: 		12/09/2023
 Citation: 	TBD
 Usage:		BAM input (suggested -q 30), estimation of sequencing reads aligning to single chromosomes (chrX, chrY, chr21) over autosomal baseline, sex inference.
 Example:	Output:		[Total number of alignments in input] [Rx] [SE for Rx] [Ry] [SE for Ry] [Inferred sex]
@@ -43,6 +43,9 @@ parser.add_option("--chr22name", action="store", type="string", dest="chr22name"
 parser.add_option("--digits", action="store", type="int", dest="digits",help="Number of decimal digits in R_y output",default=4)
 parser.add_option("--noheader", action="store_true", dest="noheader",help="Do not print header describing the columns in the output",default=False)
 parser.add_option("--idxstats", action="store_true", dest="idxstats",help="Input is from samtools idxstats",default=False)
+parser.add_option("--capture1240k", action="store_true", dest="capture1240k",help="Use when library has been enriched for 1240k SNPs", default=False)
+parser.add_option("--chr21", action="store_true", dest="chr21",help="Use to print R_21 value", default=False)
+
 (options, args) = parser.parse_args()
 
 
@@ -129,26 +132,34 @@ xSE=binomialSE(Rx,(total_chr))
 R21=1.0*chr21count/(total_chr)
 SE_21=binomialSE(R21,(total_chr))
 
-#Define values
+#Define values for 1240k SNPs
 
-XYmeanRy = 0.00246572
-XYmeanRx = 0.02969922
-XXmeanRy = 0.0000318
-XXmeanRx = 0.05877203
+if options.capture1240k: 
+	# if 1240k here
+	XYlowerRy = 0.004
+	XYupperRy = 0.03
+	XYlowerRx = 0.011
+	XYupperRx = 0.034
+	XXlowerRy = 0
+	XXupperRy = 0.0005
+	XXlowerRx = 0.035
+	XXupperRx = 0.058
+	XXXlowerRx = 0.059
+	XXXupperRx = 0.082
+	
+else:
+	XYlowerRy = 0.0019
+	XYupperRy = 0.0032
+	XYlowerRx = 0.020
+	XYupperRx = 0.037
+	XXlowerRy = 0
+	XXupperRy = 0.0005
+	XXlowerRx = 0.047
+	XXupperRx = 0.063
+	XXXlowerRx = 0.072
+	XXXupperRx = 0.1
+	
 
-XYlowerRy = 0.0019
-XYupperRy = 0.0032
-XYlowerRx = 0.020
-XYupperRx = 0.037
-XXlowerRy = 0
-XXupperRy = 0.0005
-XXlowerRx = 0.047
-XXupperRx = 0.063
-
-#Calculate Z score - optional
-
-zXX = (Rx - XXmeanRx)/xSE
-zXY = (Ry - XYmeanRy)/ySE
 
 #Assign sex
 
@@ -163,11 +174,15 @@ else:
 			sex = 'XXY'
 		elif Rx <= XYlowerRx:
 			sex = 'Consistent_with_XY'
+	elif Ry >= XYupperRy:
+		sex = 'XYY'
 	elif XXlowerRy <= Ry <= XXupperRy:
 		if XXlowerRx <= Rx <= XXupperRx:
 			sex = 'XX'
 		elif XYlowerRx <= Rx <= XYupperRx:
-			sex = 'XO'
+			sex = 'X0'
+		elif XXXlowerRx <= Rx <= XXXupperRx:
+			sex = 'XXX'
 		elif Rx <= XXlowerRx or XXupperRx <= Rx:
 			sex = 'Consistent_with_XX'
 	elif XYlowerRy <= (Ry-ySE) <= XYupperRy or XYlowerRy <= (Ry+ySE) <= XYupperRy:
@@ -186,6 +201,14 @@ else:
 
 
 
-print '\t'.join([str(total_chr),str(Rx),str(xSE),str(Ry),str(ySE),str(sex)])
+if options.chr21: 
+	if options.noheader == False:
+		print 'Na\tRx\tRx_SE\tRy\tRy_SE\tAssignment\tR21\tR21_SE'
+	print '\t'.join([str(total_chr),str(Rx),str(xSE),str(Ry),str(ySE),str(sex),str(R21),str(SE_21)])
+else:
+	if options.noheader == False:
+		print 'Na\tRx\tRxSE\tRy\tRySE\tAssignment'
+	print '\t'.join([str(total_chr),str(Rx),str(xSE),str(Ry),str(ySE),str(sex)])
 
 exit(0)
+
