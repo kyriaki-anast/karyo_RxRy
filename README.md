@@ -44,7 +44,7 @@ Estimates higher than **0.02** indicate the presence of an additional copy of ch
 Output header can be removed using ```--noheader```. 
 
 ## Citation
-Coming soon ⏳
+Anastasiadou, K. et al. (2023). Detection of chromosomal aneuploidy in ancient genomes. Communications Biology. 10.1038/s42003-023-05642-z.
 
 ## Contacts
 kyriaki.anastasiadou@crick.ac.uk  
