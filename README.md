@@ -62,6 +62,10 @@ Estimates higher than **0.02** indicate the presence of an additional copy of ch
 
 Output header can be removed using ```--noheader```. 
 
+## Limitations
+
+This script was developed and validated for low-coverage ancient DNA data. It has not been benchmarked for modern high-coverage whole-genome sequencing data, and the default thresholds may not be appropriate for such datasets. Users applying the script outside the validated ancient DNA setting should interpret karyotype assignments with caution and consider recalibrating thresholds for their own data type and coverage range.
+
 ## Citation
 If you use this script, please cite:
 
